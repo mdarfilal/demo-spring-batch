@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<batch:job id="job">
+		<batch:step id="step1">
+			<tasklet>
+				<chunk reader="fileItemReader" processor="fileItemProcessor"
+					writer="fileItemWriter" commit-interval="1" />
+			</tasklet>
+		</batch:step>
+	</batch:job>
+
+	<!-- <bean id="fileItemReader" class="fr.mdarfilal.batch.reader.FileItemReader" 
+		/> -->
+	<!-- <bean id="fileItemWriter" class="fr.mdarfilal.batch.writer.FileItemWriter" 
+		/> -->
+
+	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" value="file:.\\src\\main\\resources\\incommingFile.csv" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="delimiter" value=";" />
+						<property name="names" value="nom, prenom" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+						<property name="prototypeBeanName" value="personne" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="fileItemProcessor" class="fr.mdarfilal.batch.processor.FileItemProcessor" />
+
+	<bean id="fileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="appendAllowed" value="true" />
+		<property name="resource"
+			value="file:.\\src\\main\\resources\\outcomming.csv" />
+		<property name="lineAggregator">
+			<!-- An Aggregator which converts an object into delimited list of strings -->
+			<bean
+				class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="delimiter" value=";" />
+				<property name="fieldExtractor">
+					<!-- Extractor which returns the value of beans property through reflection -->
+					<bean
+						class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="nom,prenom" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="personne" class="fr.mdarfilal.batch.model.Personne"
+		scope="prototype" />
+
+    <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+    <bean id="jobRegistryBeanPostProcessor" class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+    	<property name="jobRegistry" ref="jobRegistry"/>
+    </bean>
+</beans>

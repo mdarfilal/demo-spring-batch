@@ -1,0 +1,33 @@
+<configuration>
+
+	<!-- for lopgback you chouls add logback-classic jar ans as usual slf4j-api -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+		<encoder>
+			<pattern>%-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	<!-- TRACE level is needed for automatic AOP trace -->
+	<logger level="TRACE" name="cine" />
+	<!-- to enable AOP for Repository trace -->
+	<logger name="org.springframework.aop.interceptor" level="TRACE" />
+
+	<!-- activation du report d'auto config de Spring -->
+	<!-- <logger level="DEBUG" -->
+	<!-- name="org.springframework.boot.autoconfigure.logging.AutoConfigurationReportLoggingInitializer"> -->
+	<!-- </logger> -->
+
+	<!-- Hibernate and JPA Logger -->
+	<logger level="INFO" name="org.hibernate" />
+	<logger level="DEBUG" name="org.hibernate.jpa.internal.util.LogHelper" />
+	<!-- useful to debug automatic property settings -->
+	<!-- <logger level="DEBUG" name="org.hibernate.cfg.SettingsFactory" /> -->
+	<logger level="TRACE" name="org.hibernate.type.descriptor.sql.BasicBinder" />
+	<logger level="DEBUG" name="org.hibernate.SQL" />
+
+</configuration>
